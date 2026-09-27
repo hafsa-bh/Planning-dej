@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon menu de la semaine</title>
+<style>
+  :root{
+    --bg:#faf5ef; --card:#fffdfa; --card2:#f5ede3; --ink:#4a3b32; --ink-soft:#8a7364;
+    --accent:#c08552; --accent-dark:#a96f3e; --accent-soft:#f0e2d2;
+    --line:#e8dccf; --rose:#b98a8a; --shadow:0 4px 18px rgba(90,70,50,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+  h1,h2,.serif{font-family:Georgia,"Times New Roman",serif}
+  .wrap{max-width:960px;margin:0 auto;padding:20px 16px 90px}
+  header.app{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;padding:22px 0 14px}
+  .logo{font-family:Georgia,serif;font-size:1.55rem;letter-spacing:.3px}
+  .logo span{color:var(--accent-dark)}
+  .week-nav{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 8px;box-shadow:var(--shadow)}
+  .week-nav button{border:none;background:transparent;font-size:1.05rem;cursor:pointer;color:var(--accent-dark);padding:4px 10px;border-radius:999px;transition:background .15s}
+  .week-nav button:hover{background:var(--accent-soft)}
+  .week-nav .label{font-size:.92rem;font-weight:600;white-space:nowrap}
+  nav.tabs{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;z-index:20}
+  nav.tabs button{flex:1;border:none;background:transparent;padding:13px 4px 15px;font-size:.86rem;font-weight:600;color:var(--ink-soft);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+  nav.tabs button .ico{font-size:1.15rem}
+  nav.tabs button.active{color:var(--accent-dark)}
+  @media(min-width:760px){
+    nav.tabs{position:static;border-top:none;background:transparent;gap:8px;margin-bottom:18px}
+    nav.tabs button{flex:0 0 auto;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:9px 20px;flex-direction:row;gap:8px;box-shadow:var(--shadow)}
+    nav.tabs button.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  }
+  h2{font-size:1.25rem;margin:18px 0 6px}
+  .hello{font-size:1.35rem;margin-top:8px}
+  .sub{color:var(--ink-soft);font-size:.92rem;margin-bottom:16px}
+  .grid-days{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:640px){.grid-days{grid-template-columns:1fr 1fr}}
+  @media(min-width:900px){.grid-days{grid-template-columns:repeat(3,1fr)}}
+  .day-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px;min-height:118px}
+  .day-name{font-size:.8rem;text-transform:uppercase;letter-spacing:1.2px;color:var(--rose);font-weight:700}
+  .day-dish{font-family:Georgia,serif;font-size:1.08rem;flex:1}
+  .day-dish.empty{color:var(--ink-soft);font-style:italic;font-size:.94rem}
+  .btn{border:none;border-radius:999px;padding:9px 18px;font-size:.9rem;font-weight:600;cursor:pointer;transition:filter .15s,background .15s;font-family:inherit}
+  .btn:hover{filter:brightness(.96)}
+  .btn-primary{background:var(--accent);color:#fff}
+  .btn-outline{background:transparent;border:1.5px solid var(--accent);color:var(--accent-dark)}
+  .btn-soft{background:var(--accent-soft);color:var(--accent-dark)}
+  .btn-ghost{background:transparent;color:var(--ink-soft);padding:6px 10px;font-size:.85rem}
+  .btn-danger{background:#f7e6e1;color:#a9503c}
+  .btn-sm{padding:6px 13px;font-size:.82rem}
+  .day-actions{display:flex;gap:6px;flex-wrap:wrap}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);margin-bottom:14px}
+  .shop-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .shop-summary p{color:var(--ink-soft);font-size:.93rem}
+  .dish-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .dish-head h3{font-family:Georgia,serif;font-size:1.1rem}
+  .ing-list{list-style:none;margin-top:8px;color:var(--ink-soft);font-size:.9rem}
+  .ing-list li{padding:3px 0;border-bottom:1px dashed var(--line)}
+  .ing-list li:last-child{border-bottom:none}
+  table.ing{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:8px}
+  table.ing th{text-align:left;color:var(--ink-soft);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.8px;padding:4px 6px;border-bottom:1px solid var(--line)}
+  table.ing td{padding:5px 6px;border-bottom:1px dashed var(--line)}
+  .shop-item{display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px dashed var(--line);font-size:.96rem}
+  .shop-item:last-child{border-bottom:none}
+  .shop-item input[type=checkbox]{width:19px;height:19px;accent-color:var(--accent);cursor:pointer;flex:none}
+  .shop-item.done .nm{text-decoration:line-through;color:var(--ink-soft)}
+  .shop-item .q{margin-left:auto;color:var(--ink-soft);font-size:.88rem;white-space:nowrap}
+  .empty-state{text-align:center;color:var(--ink-soft);padding:36px 16px;font-size:.94rem}
+  .empty-state .big{font-size:2rem;margin-bottom:8px}
+  .modal-bg{position:fixed;inset:0;background:rgba(60,45,35,.35);display:none;align-items:flex-end;justify-content:center;z-index:50;padding:0}
+  @media(min-width:640px){.modal-bg{align-items:center;padding:20px}}
+  .modal-bg.open{display:flex}
+  .modal{background:var(--card);width:100%;max-width:560px;max-height:88vh;overflow-y:auto;border-radius:20px 20px 0 0;padding:22px 20px 26px;animation:up .2s ease}
+  @media(min-width:640px){.modal{border-radius:20px}}
+  @keyframes up{from{transform:translateY(20px);opacity:.6}to{transform:none;opacity:1}}
+  .modal h3{font-family:Georgia,serif;font-size:1.2rem;margin-bottom:14px}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:.82rem;font-weight:600;color:var(--ink-soft);margin-bottom:5px}
+  .field input,.field select{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;font-size:.95rem;font-family:inherit;background:#fff;color:var(--ink)}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--accent)}
+  .ing-row{display:grid;grid-template-columns:1fr 74px 96px 34px;gap:7px;margin-bottom:7px;align-items:center}
+  .ing-row input,.ing-row select{padding:8px 9px;border:1.5px solid var(--line);border-radius:10px;font-size:.88rem;font-family:inherit;background:#fff;color:var(--ink);width:100%}
+  .ing-row .del{border:none;background:transparent;color:var(--rose);font-size:1.1rem;cursor:pointer}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+  .pick-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 6px;border-bottom:1px dashed var(--line);cursor:pointer;border-radius:8px}
+  .pick-item:hover{background:var(--card2)}
+  .pick-item .nm{font-weight:600}
+  .pick-item .ings{font-size:.82rem;color:var(--ink-soft)}
+  .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 20px;border-radius:999px;font-size:.88rem;opacity:0;pointer-events:none;transition:opacity .25s;z-index:99}
+  @media(min-width:760px){.toast{bottom:26px}}
+  .toast.show{opacity:.95}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="app">
+    <div class="logo">🍽️ Mon <span>menu</span> de la semaine</div>
+    <div class="week-nav">
+      <button id="prevWeek" title="Semaine précédente">←</button>
+      <div class="label" id="weekLabel"></div>
+      <button id="nextWeek" title="Semaine suivante">→</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button data-tab="planning" class="active"><span class="ico">🗓️</span>Planning</button>
+    <button data-tab="plats"><span class="ico">🥘</span>Mes plats</button>
+    <button data-tab="courses"><span class="ico">🛒</span>Courses</button>
+  </nav>
+
+  <main id="view"></main>
+</div>
+
+<div class="modal-bg" id="modalBg"><div class="modal" id="modalBox"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= État & persistance ================= */
+const LS_KEY = "menu_semaine_v1";
+const DAYS = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
+const UNITS = ["pièce","pièces","g","kg","ml","cl","L","boîte","boîtes","sachet","sachets","paquet","botte","c. à soupe","c. à café","pincée","verre"];
+const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+
+let state = loadState();
+let ui = { tab: "planning", weekOffset: 0 };
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){ const s = JSON.parse(raw); if(s && Array.isArray(s.dishes)) return s; }
+  }catch(e){}
+  // Premier lancement : plats d'exemple (supprimables)
+  const s = {
+    dishes:[
+      {id:uid(), name:"Tajine de poulet", ingredients:[
+        {name:"Poulet", qty:"1", unit:"kg"},{name:"Oignon", qty:"2", unit:"pièces"},
+        {name:"Olives", qty:"100", unit:"g"},{name:"Citron", qty:"1", unit:"pièce"}]},
+      {id:uid(), name:"Pâtes au thon", ingredients:[
+        {name:"Pâtes", qty:"500", unit:"g"},{name:"Thon", qty:"2", unit:"boîtes"},
+        {name:"Tomates", qty:"3", unit:"pièces"}]},
+      {id:uid(), name:"Couscous", ingredients:[
+        {name:"Semoule", qty:"500", unit:"g"},{name:"Poulet", qty:"1", unit:"kg"},
+        {name:"Carottes", qty:"4", unit:"pièces"},{name:"Poivron", qty:"2", unit:"pièces"}]}
+    ],
+    weeks:{}
+  };
+  saveState(s);
+  return s;
+}
+function saveState(s){ try{ localStorage.setItem(LS_KEY, JSON.stringify(s||state)); }catch(e){} }
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function esc(t){ return String(t==null?"":t).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* ================= Semaines ================= */
+function mondayOf(offset){
+  const d = new Date(); d.setHours(0,0,0,0);
+  const diff = (d.getDay()+6)%7; // lundi=0
+  d.setDate(d.getDate()-diff+offset*7);
+  return d;
+}
+function weekKey(offset){ const d=mondayOf(offset); return d.toISOString().slice(0,10); }
+function fmtDate(d){ return d.getDate()+" "+MOIS[d.getMonth()]; }
+function weekLabel(offset){
+  const a = mondayOf(offset), b = new Date(a); b.setDate(a.getDate()+6);
+  let s = "Semaine du "+fmtDate(a)+" au "+fmtDate(b);
+  if(a.getMonth()!==b.getMonth()||a.getFullYear()!==b.getFullYear()) s += " "+b.getFullYear();
+  return s;
+}
+function getWeek(offset){
+  const k = weekKey(offset);
+  if(!state.weeks[k]) state.weeks[k] = { days:{}, checked:{} };
+  return state.weeks[k];
+}
+function getDish(id){ return state.dishes.find(d=>d.id===id); }
+
+/* ================= Liste de courses ================= */
+function generateShopping(offset){
+  const w = getWeek(offset);
+  const map = {};
+  DAYS.forEach(day=>{
+    const id = w.days[day];
+    if(!id) return;
+    const dish = getDish(id);
+    if(!dish) return;
+    dish.ingredients.forEach(ing=>{
+      if(!ing.name || !ing.name.trim()) return;
+      const key = ing.name.trim().toLowerCase()+"|"+(ing.unit||"");
+      if(!map[key]) map[key] = { name:ing.name.trim(), unit:ing.unit||"", qty:0, texts:[] };
+      const raw = String(ing.qty).trim();
+      const q = /^-?\d+([.,]\d+)?$/.test(raw) ? parseFloat(raw.replace(",",".")) : NaN;
+      if(!isNaN(q)) map[key].qty += q; else if(raw) map[key].texts.push(raw);
+    });
+  });
+  return Object.entries(map).map(([key,v])=>{
+    let qty = "";
+    if(v.qty>0){ let q = Math.round(v.qty*100)/100; qty = String(parseFloat(q.toFixed(2))); }
+    if(v.texts.length) qty = (qty?qty+" + ":"")+v.texts.join(" + ");
+    return { key, name:v.name, qty, unit:v.unit };
+  }).sort((a,b)=>a.name.localeCompare(b.name,"fr"));
+}
+function fmtQty(q,u){ return q ? (q+" "+u).trim() : u; }
+
+/* ================= Rendu ================= */
+const view = document.getElementById("view");
+
+function render(){
+  document.getElementById("weekLabel").textContent = weekLabel(ui.weekOffset);
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("active", b.dataset.tab===ui.tab));
+  if(ui.tab==="planning") renderPlanning();
+  else if(ui.tab==="plats") renderPlats();
+  else renderCourses();
+}
+
+function renderPlanning(){
+  const w = getWeek(ui.weekOffset);
+  const shop = generateShopping(ui.weekOffset);
+  const doneCount = shop.filter(i=>w.checked[i.key]).length;
+  let html = `<h2 class="hello">Bonjour 👋</h2>
+    <p class="sub">Voici votre planning de la semaine.</p>
+    <div class="grid-days">`;
+  DAYS.forEach(day=>{
+    const dish = getDish(w.days[day]);
+    html += `<div class="day-card">
+      <div class="day-name">${day}</div>
+      ${dish
+        ? `<div class="day-dish">${esc(dish.name)}</div>
+           <div class="day-actions">
+             <button class="btn btn-soft btn-sm" onclick="openPick('${day}')">Changer</button>
+             <button class="btn btn-ghost btn-sm" onclick="clearDay('${day}')">Retirer</button>
+           </div>`
+        : `<div class="day-dish empty">Aucun plat prévu</div>
+           <div class="day-actions"><button class="btn btn-outline btn-sm" onclick="openPick('${day}')">Choisir un plat</button></div>`}
+    </div>`;
+  });
+  html += `</div>
+    <div class="card" style="margin-top:18px">
+      <div class="shop-summary">
+        <div><h2 style="margin:0">🛒 Liste de courses</h2>
+        <p>${shop.length? (shop.length-doneCount)+" produit"+(shop.length-doneCount>1?"s":"")+" à acheter" : "Aucun produit pour cette semaine"}</p></div>
+        <button class="btn btn-primary" onclick="ui.tab='courses';render()">Voir ma liste</button>
+      </div>
+    </div>`;
+  view.innerHTML = html;
+}
+
+function renderPlats(){
+  let html = `<div class="toolbar">
+      <div><h2 style="margin:0">🥘 Mes plats</h2>
+      <p class="sub" style="margin:4px 0 0">${state.dishes.length} plat${state.dishes.length>1?"s":""} enregistré${state.dishes.length>1?"s":""}</p></div>
+      <button class="btn btn-primary" onclick="openDishModal()">+ Ajouter un plat</button>
+    </div>`;
+  if(!state.dishes.length){
+    html += `<div class="card empty-state"><div class="big">🥘</div>Aucun plat pour le moment.<br>Créez votre premier plat avec ses ingrédients !</div>`;
+  }
+  state.dishes.forEach(d=>{
+    const usedIn = Object.values(state.weeks).filter(w=>Object.values(w.days).includes(d.id)).length;
+    html += `<div class="card">
+      <div class="dish-head">
+        <h3>${esc(d.name)}</h3>
+        <div>
+          <button class="btn btn-soft btn-sm" onclick="openDishModal('${d.id}')">Modifier</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteDish('${d.id}')">Supprimer</button>
+        </div>
+      </div>
+      ${d.ingredients.length? `<table class="ing"><tr><th>Ingrédient</th><th>Quantité</th><th>Unité</th></tr>
+        ${d.ingredients.map(i=>`<tr><td>${esc(i.name)}</td><td>${esc(i.qty)}</td><td>${esc(i.unit)}</td></tr>`).join("")}
+      </table>` : `<p style="color:var(--ink-soft);font-size:.88rem;margin-top:6px">Aucun ingrédient.</p>`}
+      ${usedIn? `<p style="font-size:.8rem;color:var(--rose);margin-top:8px">Utilisé dans ${usedIn} semaine${usedIn>1?"s":""}</p>`:""}
+    </div>`;
+  });
+  view.innerHTML = html;
+}
+
+function renderCourses(){
+  const w = getWeek(ui.weekOffset);
+  const shop = generateShopping(ui.weekOffset);
+  let html = `<h2>🛒 Liste des courses</h2>
+    <p class="sub">${weekLabel(ui.weekOffset)}</p>`;
+  if(!shop.length){
+    html += `<div class="card empty-state"><div class="big">🛒</div>
+      Votre liste est vide.<br>Ajoutez des plats au planning pour générer automatiquement vos courses.</div>`;
+  }else{
+    const done = shop.filter(i=>w.checked[i.key]).length;
+    html += `<div class="card">
+      <div class="toolbar" style="margin-bottom:6px">
+        <p class="sub" style="margin:0">${done} / ${shop.length} acheté${done>1?"s":""}</p>
+        <button class="btn btn-soft btn-sm" onclick="uncheckAll()">Tout décocher</button>
+      </div>`;
+    shop.forEach(i=>{
+      const c = !!w.checked[i.key];
+      html += `<label class="shop-item ${c?"done":""}">
+        <input type="checkbox" ${c?"checked":""} onchange="toggleCheck('${esc(i.key)}')">
+        <span class="nm">${esc(i.name)}</span>
+        <span class="q">${esc(fmtQty(i.qty,i.unit))}</span>
+      </label>`;
+    });
+    html += `</div>`;
+  }
+  view.innerHTML = html;
+}
+
+/* ================= Actions ================= */
+function setDay(day, dishId){
+  const w = getWeek(ui.weekOffset);
+  if(dishId) w.days[day]=dishId; else delete w.days[day];
+  saveState(); closeModal(); render(); toast(dishId?"Plat ajouté au "+day.toLowerCase()+" ✅":"Jour libéré");
+}
+function clearDay(day){ setDay(day, null); }
+function toggleCheck(key){
+  const w = getWeek(ui.weekOffset);
+  if(w.checked[key]) delete w.checked[key]; else w.checked[key]=true;
+  saveState(); render();
+}
+function uncheckAll(){
+  const w = getWeek(ui.weekOffset);
+  w.checked = {};
+  saveState(); render(); toast("Liste réinitialisée 🔄");
+}
+function deleteDish(id){
+  const d = getDish(id);
+  if(!confirm(`Supprimer le plat « ${d.name} » ?\nIl sera retiré de tous les plannings.`)) return;
+  state.dishes = state.dishes.filter(x=>x.id!==id);
+  Object.values(state.weeks).forEach(w=>{ Object.keys(w.days).forEach(day=>{ if(w.days[day]===id) delete w.days[day]; }); });
+  saveState(); render(); toast("Plat supprimé");
+}
+
+/* ================= Modales ================= */
+const modalBg = document.getElementById("modalBg"), modalBox = document.getElementById("modalBox");
+function closeModal(){ modalBg.classList.remove("open"); }
+modalBg.addEventListener("click", e=>{ if(e.target===modalBg) closeModal(); });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeModal(); });
+
+function openPick(day){
+  const w = getWeek(ui.weekOffset);
+  if(!state.dishes.length){
+    modalBox.innerHTML = `<h3>Choisir un plat — ${day}</h3>
+      <p class="sub">Vous n'avez pas encore de plat. Créez-en un d'abord !</p>
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="closeModal();openDishModal()">+ Créer un plat</button>
+        <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+      </div>`;
+  }else{
+    let html = `<h3>Choisir un plat — ${day}</h3>`;
+    if(w.days[day]) html += `<div class="pick-item" onclick="setDay('${day}',null)"><div><div class="nm">— Laisser ce jour vide —</div></div></div>`;
+    state.dishes.forEach(d=>{
+      html += `<div class="pick-item" onclick="setDay('${day}','${d.id}')">
+        <div><div class="nm">${esc(d.name)}</div>
+        <div class="ings">${d.ingredients.map(i=>esc(i.name)).slice(0,4).join(", ")}${d.ingredients.length>4?"…":""}</div></div>
+        <span style="color:var(--accent-dark)">${w.days[day]===d.id?"✓":""}</span>
+      </div>`;
+    });
+    modalBox.innerHTML = html;
+  }
+  modalBg.classList.add("open");
+}
+
+function openDishModal(id){
+  const d = id ? getDish(id) : null;
+  let rows = d && d.ingredients.length ? d.ingredients : [{name:"",qty:"",unit:""}];
+  modalBox.innerHTML = `<h3>${d?"Modifier le plat":"Nouveau plat"}</h3>
+    <div class="field"><label>Nom du plat</label>
+      <input id="dishName" type="text" placeholder="Ex : Tajine de poulet" value="${d?esc(d.name):""}"></div>
+    <div class="field"><label>Ingrédients</label>
+      <div class="ing-row" style="margin-bottom:2px">
+        <span style="font-size:.78rem;color:var(--ink-soft);font-weight:600">INGRÉDIENT</span>
+        <span style="font-size:.78rem;color:var(--ink-soft);font-weight:600">QTÉ</span>
+        <span style="font-size:.78rem;color:var(--ink-soft);font-weight:600">UNITÉ</span><span></span>
+      </div>
+      <div id="ingRows"></div>
+      <button class="btn btn-soft btn-sm" onclick="addIngRow()">+ Ajouter un ingrédient</button>
+    </div>
+    <div class="modal-actions">
+      ${d?`<button class="btn btn-danger" onclick="closeModal();deleteDish('${d.id}')">Supprimer</button>`:""}
+      <button class="btn btn-ghost" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="saveDish('${d?d.id:""}')">Enregistrer</button>
+    </div>`;
+  const box = document.getElementById("ingRows");
+  rows.forEach(r=>box.appendChild(makeIngRow(r)));
+  modalBg.classList.add("open");
+  setTimeout(()=>document.getElementById("dishName").focus(),50);
+}
+
+function makeIngRow(data){
+  const div = document.createElement("div");
+  div.className = "ing-row";
+  div.innerHTML = `<input class="i-name" type="text" placeholder="Ex : Tomates" value="${esc(data.name||"")}">
+    <input class="i-qty" type="text" inputmode="decimal" placeholder="2" value="${esc(data.qty||"")}">
+    <select class="i-unit">${UNITS.map(u=>`<option ${u===data.unit?"selected":""}>${u}</option>`).join("")}</select>
+    <button class="del" title="Supprimer" onclick="this.parentElement.remove()">×</button>`;
+  return div;
+}
+function addIngRow(){
+  document.getElementById("ingRows").appendChild(makeIngRow({}));
+}
+
+function saveDish(id){
+  const name = document.getElementById("dishName").value.trim();
+  if(!name){ toast("Donnez un nom au plat 🙂"); return; }
+  const ingredients = [];
+  document.querySelectorAll("#ingRows .ing-row").forEach(r=>{
+    const n = r.querySelector(".i-name").value.trim();
+    if(!n) return;
+    ingredients.push({ name:n, qty:r.querySelector(".i-qty").value.trim(), unit:r.querySelector(".i-unit").value });
+  });
+  if(id){
+    const d = getDish(id); d.name=name; d.ingredients=ingredients;
+  }else{
+    state.dishes.push({id:uid(), name, ingredients});
+  }
+  saveState(); closeModal(); ui.tab="plats"; render();
+  toast(id?"Plat modifié ✅":"Plat ajouté ✅");
+}
+
+/* ================= Divers ================= */
+let toastTimer;
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove("show"), 1800);
+}
+
+document.getElementById("prevWeek").onclick = ()=>{ ui.weekOffset--; render(); };
+document.getElementById("nextWeek").onclick = ()=>{ ui.weekOffset++; render(); };
+document.querySelectorAll("nav.tabs button").forEach(b=> b.onclick = ()=>{ ui.tab=b.dataset.tab; render(); });
+
+render();
+</script>
+</body>
+</html>
